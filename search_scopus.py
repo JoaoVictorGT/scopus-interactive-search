@@ -7,13 +7,9 @@ from config import API_KEY
 URL_DO_ENDPOINT = "https://api.elsevier.com/content/search/scopus"
 
 def get_interactive_query():
-    """
-    Coleta os parâmetros de busca do usuário de forma interativa
-    e retorna as strings de query formatadas e o contador.
-    """
+
     print("--- 🤖 Interactive Scopus Search Setup ---")
     
-    # --- 1. Campo de Busca ---
     print("\nWhich main field do you want to search in?")
     print("  1: Title only (TITLE)")
     print("  2: Title, Abstract, and Keywords (TITLE-ABS-KEY)")
@@ -22,23 +18,19 @@ def get_interactive_query():
     search_field = "TITLE-ABS-KEY" if field_choice == '2' else "TITLE"
     print(f"-> Field selected: {search_field}")
 
-    # --- 2. Termos do Assunto ---
     default_subjects = "chicken OR broiler OR poultry"
     subject_terms = input(f"\nEnter the SUBJECT terms (separated by OR)\n[Default: {default_subjects}]: ")
     if not subject_terms:
         subject_terms = default_subjects
 
-    # --- 3. Termos da Ação/Conceito ---
     default_action = "weight W/5 prediction"
     action_terms = input(f"\nEnter the ACTION terms (e.g., weight, prediction, etc.)\n[Default: {default_action}]: ")
     if not action_terms:
         action_terms = default_action
 
-    # Monta a query de keywords
     keywords_query = f"{search_field}( ({subject_terms}) AND ({action_terms}) )"
     print(f"-> Keywords Query: {keywords_query}")
 
-    # --- 4. Filtro de Data ---
     start_year = 0
     default_year = 2016
     while True:
@@ -62,7 +54,6 @@ def get_interactive_query():
     date_filter_query = f"AND ( PUBYEAR > {start_year - 1} )"
     print(f"-> Date Filter: {date_filter_query}")
     
-    # --- 5. Contagem de Resultados (user_prompt 5) ---
     result_count = 0
     default_count = 25
     while True:
@@ -107,6 +98,7 @@ excluded_titles = [
     "Non-Invasive Live Chicken Weight Estimation Using Geometric Features and Random Forest Regression"
 ]
 
+## Excluding the word egg on papers
 excluded_words = [
     "egg"
 ]
