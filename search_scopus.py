@@ -2,12 +2,12 @@ import requests
 import json
 from config import API_KEY
 
-### Config
-##API_KEY = "PASTE KEY HERE"
+##API_KEY = "my key"
+
+### Configuration
 URL_DO_ENDPOINT = "https://api.elsevier.com/content/search/scopus"
 
 def get_interactive_query():
-
     print("--- 🤖 Interactive Scopus Search Setup ---")
     
     print("\nWhich main field do you want to search in?")
@@ -54,64 +54,21 @@ def get_interactive_query():
     date_filter_query = f"AND ( PUBYEAR > {start_year - 1} )"
     print(f"-> Date Filter: {date_filter_query}")
     
-    result_count = 0
-    default_count = 25
-    while True:
-        try:
-            count_input = input(f"\nHow many results per page do you want?\n[Default: {default_count}]: ")
-            
-            if not count_input:
-                result_count = default_count
-                print(f"-> Default count selected: {result_count}")
-                break
-                
-            result_count = int(count_input)
-            
-            if 0 < result_count <= 200:
-                break
-            else:
-                print("Please enter a valid number (e.g., 25, 50, 100).")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-    
     print("------------------------------------------------------")
     
-    return keywords_query, date_filter_query, result_count
+    return keywords_query, date_filter_query
 
-keywords, date_filter, result_count = get_interactive_query()
+# Removed result_count from the function return
+keywords, date_filter = get_interactive_query()
 
 ### Exclude list
-excluded_titles = [
-    "Weight prediction method for individual live chickens based on single-view point cloud information",
-    "Revealing in vivo broiler chicken growth state: Integrating CT imaging and deep learning for non-invasive reproductive phenotypic measurement",
-    "Online chicken carcass volume estimation using depth imaging and 3D reconstruction",
-    "In Vivo Prediction of Breast Muscle Weight in Broiler Chickens Using X-ray Images Based on Deep Learning and Machine Learning",
-    "Estimating Ross 308 Broiler Chicken Weight Through Integration of Random Forest Model and Metaheuristic Algorithms",
-    "Predicting body weight in Ross 308 broiler chickens using a data mining algorithm approach",
-    "Automated precision weighing: Leveraging 2D video feature analysis and machine learning for live body weight estimation of broiler chickens",
-    "Weight prediction of broiler chickens using 3D computer vision",
-    "Development of transfer function for weight prediction of live broiler chicken using machine vision",
-    "A method for weighing broiler chickens using improved amplitude-limiting filtering algorithm and BP neural networks",
-    "In vivo prediction of abdominal fat and breast muscle in broiler chicken using live body measurements based on machine learning",
-    "Several models combined with ultrasound techniques to predict breast muscle weight in broilers.",
-    "An Improved Method for Broiler Weight Estimation Integrating Multi-Feature with Gradient Boosting Decision Tree",
-    "Non-Invasive Live Chicken Weight Estimation Using Geometric Features and Random Forest Regression"
-]
-
-## Excluding the word egg on papers
 excluded_words = [
     "egg"
 ]
 
-
-
-### String of excluded itens
-title_exclusion_str = " ".join([f'AND NOT TITLE("{title}")' for title in excluded_titles])
+### String of excluded items
 word_exclusion_str = " ".join([f'AND NOT TITLE-ABS-KEY({word})' for word in excluded_words])
-
-
-### combined excludings
-exclusion_filter = f"{title_exclusion_str} {word_exclusion_str}"
+exclusion_filter = word_exclusion_str
 
 
 ### All togheter
@@ -119,6 +76,8 @@ final_query = f"{keywords} {date_filter} {exclusion_filter}"
 
 
 ### Params e Headers
+# Defined count here statically
+result_count = 25 
 
 params = {
     "query": final_query,
@@ -129,10 +88,9 @@ headers = {
     "X-ELS-APIKey": API_KEY
 }
 
-### Req
+### Requisition
 
 print(f"\n🔎 Searching Scopus API...")
-##print(f"Query: {final_query}")
 print("...loading...")
 
 try:
